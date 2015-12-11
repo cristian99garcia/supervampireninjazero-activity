@@ -34,6 +34,7 @@ class SuperVampireNinjaZero(activity.Activity):
 
         if platform.machine().startswith('arm'):  # Needs arm libs
             self.load_libs = False
+            arch = "arm"
 
         else:
             self.load_libs = True
@@ -86,13 +87,13 @@ class SuperVampireNinjaZero(activity.Activity):
         self._vte.connect('child-exited', self.on_child_exit)
         self._vte.grab_focus()
 
-        if self.load_libs:
+        if arch == "x86":  # No work on x86-64 and arm
             envv = ["LD_LIBRARY_PATH=%s" % libs_path, "LD_PRELOAD=%s" % os.path.join(libs_path, "libsugarize.so"), "NET_WM_NAME=SuperVampireNinjaZero"]
-        
+            argv = ['/bin/sh', '-c', os.path.join(bundle_path, "bin/SuperVampireNinjaZero")]
+
         else:
             envv = []
-            
-        argv = ['/bin/sh','-c', os.path.join(bundle_path, "bin/SuperVampireNinjaZero")]
+            argv = ["/bin/sh", "-c", "echo", "Can't run the game on %s computers." % arch, "&&", "sleep", "15"]            
 
         self._pid = self._vte.fork_command \
             (command='/bin/sh',
